@@ -1,0 +1,17 @@
+******** graph attributes   ********
+/fpo  pd  8.00 4.00        ;page size
+/sf   "Arial"              ;font
+/sf   b   OFF              ;Bold
+/sf   i   OFF              ;Italic
+/sf   u   OFF              ;Underline
+/fpo  pt  12.00            ;base point size
+/fpo  gt  base             ;graph-title size
+/fpo  at  base             ;axis-title size
+/fpo  an  base             ;annotation size
+/fpo  lt  base             ;legend-text size
+/fpo  po  OFF              ;portrait mode
+/fpo  co  ON               ;color
+/fpo  lw  3.00             ;line weight
+/sa   d   1.00             ;data mark size
+/sa   t   0.50             ;tic size
+/sa   b   0.00             ;bar separation

@@ -1,0 +1,291 @@
+The program 'epidemo.exe' demonstrates how you can use EasyPlot as if it
+were a graphing subroutine of your own application.  The demo starts up
+a copy of EasyPlot and sends it real-time data to graph.  It lets you
+control the pace at which data is sent and the amount of data sent per
+update.
+
+Put the demo program in the same directory as EasyPlot and run it.
+You'll get a small dialog box and a little terminal window next to it.
+When you hit 'Start', the demo launches EasyPlot and begins generating
+data (a simple sine wave) and sending it to EasyPlot at timed intervals.
+
+Update Interval
+===============
+The top edit box lets you set the update interval.  Select smaller
+values to update the graph at a faster pace.
+
+The demo uses a standard Windows timer to pace the data updates.  Timers
+in Windows are set in milliseconds and their accuracy depends on the
+computer and the tasks running.  Consider the times you select approximates.
+
+If EasyPlot has not finished plotting the last set of data when it's
+time to send another, the demo skips a pass and waits for the next time
+interval to elapse.  When EasyPlot is ready, the demo reports the number
+of timer intervals missed in the terminal window, for example:
+
+	Missed 3 timers at X=15.1K
+
+Points Sent Per Update
+======================
+The second edit box sets the number of X-Y pairs the demo sends to
+EasyPlot at each update.  The demo lets you send from 10 to 10,000
+points at a time.  The demo uses only numbers that are powers of 10, but
+EasyPlot can take any number of points.
+
+Width of Graph
+==============
+The third edit box sets the number of updates that fit along the X-axis.
+Larger values create more room for data; you'll see more history of the
+data stream, the curve will move slower across the graph, and graph will
+hold steady for longer periods without needing to scroll to the left.
+Smaller values show data in more detail but the data will move faster
+across the graph and the X-axis will scroll more frequently.
+
+The demo multiplies the 'width' value by the number of points per update
+to compute the X-axis range.
+
+ASCII or Binary Data Transfer
+=============================
+EasyPlot can import data in ASCII and binary formats.  The demo lets you
+toggle between the two formats on-the-fly.  With small amounts of data
+per update, you won't notice any difference as you switch from one
+format to the other.  With large blocks of data, binary format is far
+more efficient, both for the demo to generate and for EasyPlot to
+import.  When you're near your system's limit, you'll get many more
+"Missed timer" messages using ASCII format instead of binary.
+
+We recommend using binary format when files hold more than a few hundred points.
+With fewer than 100 points, the difference in overhead is negligible.
+
+Sampling / Plotting Rate
+========================
+Each time you change the update interval or the number of points sent
+per update, the demo writes the current data generation/plotting rate in
+the terminal window, for example:
+
+	Plotting 2.0Kpts/sec  (100/50ms)
+
+The rate at which you can send data to EasyPlot depends on the speed of
+your system and the number of active processes.  You can use the demo to
+determine a reasonable data flow rate for your application.  When you
+begin seeing "Missed timer" messages, you're approaching the limit.
+
+Minimizing System Overhead from Plotting Data
+=============================================
+If you need to keep up with a high sampling rate, there are ways you can
+design your application to minimize the overhead involved in plotting
+data.
+
+It takes EasyPlot a certain amount of time to process any data file, be
+it a few lines or a few thousand.  You're better off sending more points
+per interval rather that trying to reduce the update interval.
+
+EasyPlot can import binary files much quicker than ASCII.  With anything
+near a few hundred or more points, use binary formatted files.
+
+Try to minimize how much of the graph needs to be drawn.  If you're
+trying to plot a stream of data, display the curve with solid connecting
+lines and use the API_ADD_DATA command to append small amounts of data
+to a curve.  When adding data to a curve, EasyPlot draws only the new
+data (assuming solid connecting lines); it leaves the axes and existing
+data in place.
+
+When you need to scroll the graph, it's possible to redraw only the data
+and the X-axis labels.	Use the API_SHFT_X and API_SHFT_X_NOUPDATE
+commands and try to shift by a multiple of the distance between major
+tics.  The 'NOUPDATE' command sets the X-axis range but doesn't draw
+anything; use it when you're about to replace all the old data with the
+API_NEW_DATA command.  If you shift by major tic increments, EasyPlot
+will know not to redraw the tics.  Keeping the major tics from moving
+also produces cleaner animation; values change but they won't dance
+around.
+
+Try not to have too much data accumulated in EasyPlot when you scroll
+the X-range.  When adding data to a curve, it doesn't matter how much
+data has accumulated.  When shifting the X-axis, however, EasyPlot needs
+to replot the old data.  If you scroll by the entire width of the graph,
+use API_SHFT_X_NOUPDATE followed by a API_NEW_DATA command to clear the
+old data and plotting new data on the new range.
+
+=========================================================================
+Details on How the Demo Graphs Data Using EasyPlot
+=========================================================================
+The EPI Demo
+=============
+The EasyPlot Programming Interface Demo was designed to show off
+EasyPlot's programming interface and also be an example of how to use
+the PI.  You can look through the source code and copy sections into
+your own application.
+
+The demo was written in C and consists of two files, 'epi.c' and
+'epi_lib.c'.  'Epi.c' is about 500 lines long and makes up the core of
+the demo.  The file 'epi_lib.c' is about 300 lines and contains routines
+supporting the terminal window and a few string-related tasks.
+
+The demo passes data and graph-setup commands to EasyPlot through a
+single file, 'ep_data'.  When launching EasyPlot (with the CreateProcess
+command), the demo uses the '-run=' command-line parameter to tell
+EasyPlot where to find the data, for example:
+
+	c:\ep\epw32.exe -run=c:\ep\ep_data ...
+
+The demo puts data (and EasyPlot batch commands if initializing the
+graph) into 'ep_data' and tells EasyPlot to read the file.  When
+initializing the graph, the demo uses the API_RUN_FILE command to tell
+EasyPlot to read the file.  When appending data to the curve, it uses
+the API_ADD_DATA command.  To clear the old data before plotting a new
+set, it uses API_NEW_DATA.
+
+Starting EasyPlot
+=================
+The demo calls CreateProcess and then goes into the following loop to
+retrieve the 'handle' to the EasyPlot window:
+
+    for (ct=0; !epwh && ct < 100; ct++) {
+      Sleep( 20);			// give ep time to create its window
+      EnumThreadWindows( pi.dwThreadId, enum_epwh, 0);
+      }
+
+Applications communicate with EasyPlot by sending it messages; you need
+the handle to EasyPlot's main window to send it messages.
+
+The EnumThreadWindows function calls 'enum_epwh' once for each window
+associated with the given thread.  EasyPlot creates only one window.
+When 'enum_epwh' is called, it sets 'epwh' and demo is ready to proceed.
+
+Sending Commands to EasyPlot
+============================
+Applications send messages to EasyPlot with the standard Windows
+SendMessage or PostMessage commands.  Using SendMessage is a simpler
+because you know the task is complete when the function returns.  With
+PostMessage, you have to avoid timing/synchronization problems, such as
+overwriting the data file before EasyPlot has had a chance to plot it.
+
+The demo uses PostMessage so that it can count missed update intervals
+when trying to plot data faster than the system can handle.  If you want
+to keep your application running and not wait for EasyPlot, use
+PostMessage.
+
+To stay synchronized with EasyPlot, the demo posts an API_REMOVE_FILE to
+EasyPlot after posting one of the three read-file commands.  It then
+makes sure the file doesn't exist before putting new data in it and
+posting another 'read' message.  The demo uses the Microsoft C '_access'
+library function to check whether the file exists; you could also just
+try opening the file for reading and, if it opens, close it and assume
+you need to wait a bit longer.
+
+Initializing the Graph
+======================
+Every time you hit 'Start' or change the graph width or number of points
+per update, the demo reinitializes the graph by putting the following
+EasyPlot batch commands (without comments) at the top of the 'ep_data'
+file:
+
+    /fl 	     ;close all graphs	  (File  / Close All)
+    /sm OFF	     ;data markers off	  (Style / Mark Pts)
+    /sd OFF	     ;dashed lines off	  (Style / Dash)
+    /sc ON	     ;connecting lines on (Style / Connect Pts)
+    /or y -2 2	     ;set Y-range	  (Options / Range -- in EP menu only)
+    /or x 0 XMAX     ;set X-range	  (Options / Range -- in EP menu only)
+
+XMAX is computed as the number of points per update times the width of
+the graph.  (You choose the width in the demo dialog in 'update' units.)
+It then puts a set of data in the file (right after the commands) and
+posts the following 3 messages to EasyPlot:
+
+    PostMessage( epwh, WM_COMMAND, API_RUN_FILE, 0);
+    PostMessage( epwh, WM_COMMAND, API_SET_CURVE, 1);
+    PostMessage( epwh, WM_COMMAND, API_REMOVE_FILE, 0);
+
+The first tells EasyPlot to read the file, the second selects curve #1
+as the 'currently selected curve' in EasyPlot, and the third tells
+EasyPlot to remove the run file ('ep_data', in this case).
+
+The application continues running after each PostMessage command but
+EasyPlot will not process a posted message until all previously posted
+messages have been processed.  If you follow a PostMessage command with
+a SendMessage, however, EasyPlot will probably process the 'sent'
+message before the 'posted' one.
+
+Adding Data to the Curve
+========================
+Once the graph is initialized, the demo uses the API_ADD_DATA command to
+append data to the selected curve without affecting any other aspect of
+the graph.  Adding data to a curve is the most efficient way to plot in
+real-time because EasyPlot draws only the new data (assuming the curve
+is displayed with solid connecting lines).
+
+The demo continues to use the API_ADD_DATA command as long as there's
+room on the graph for the new data.  When appending data to a curve,
+EasyPlot does not check the graph range; it's up to your application
+(the demo, in this case) to shift the X-axis when necessary.
+
+Scrolling the X-Range
+=====================
+When the curve extends off the graph, the demo shifts the X-axis range
+by the number of major-tic increments that fit along the axis.	Because
+of the number of ranges possible, the demo lets EasyPlot select the tic
+locations.  It uses the API_GET_XMAJS and API_GET_XTICD commands to
+retrieve the number and distance between major tics on the X-axis:
+
+    majs       = SendMessage(epwh, WM_COMMAND, API_GET_XMAJS, 0);
+    (long)ticd = SendMessage(epwh, WM_COMMAND, API_GET_XTICD, 0);
+
+The 'ticd' variable is a floating-point value; 'majs' is an integer.  The
+demo shifts the X-axis by 'majs * ticd'.
+
+In your own application, you'll probably know the range of the X-axis
+and where you want tic marks.  You can set the tic placement with the
+EasyPlot batch command:
+
+    /oaas  x  T  D  N	 ;labeling scheme (Options/Auto Tics/Set Locs - EP menu only)
+
+where 'x' specifies the axis, 'T' the location of a major tic (where to
+start labeling), 'D' the distance between major tics, and 'N' the number
+of minor tics between each pair of major tics.	To specify tic locations,
+add the '/oaas...' command to a file you have EasyPlot read.
+
+Shifting the axis takes more time than appending data to a curve.  If
+you're close to the maximum plotting rate, you might see "Missed timer"
+messages when the graph is shifted but not while the curve moves along
+the graph.
+
+Clearing Old Data
+=================
+After about five or ten graph widths of data have accumulated and scrolled
+out of sight, the demo uses the API_NEW_DATA to replace all the old data
+with the new values.  It displays the message "Removing N old pts" in the
+terminal window, where 'N' is the number of points removed.
+
+The number of points that accumulate before being cleared depends on how
+much data you let fit on the graph.  If you select the widest X-range
+and the maximum number of points per transfer, you'll get a million data
+points on a single graph.
+
+The data the demo generates is a simple sine wave, where the point
+number is the X-value.	When X is greater than 5 million, the demo
+resets the graph to start back at 0.
+
+Closing EasyPlot
+================
+When you select the 'Close ep' or 'Exit demo' buttons, the demo sends an
+API_CLOSE message to EasyPlot, telling EasyPlot to shut down.
+
+Other Tips
+==========
+When starting or stopping the data flow, the demo calls the Windows
+EnableWindow function to enable or disable mouse and keyboard input to
+EasyPlot.  You should disable the EasyPlot window when plotting data
+from your application.	Otherwise, the user can click on EasyPlot
+compete with your program for EasyPlot's attention.  The result can
+be nothing but confusion.
+
+When the demo clears away old data with the API_NEW_DATA command, it
+first sends an API_LOCK_YAXIS command to lock the Y-axis.  When locked,
+EasyPlot will not rescale or redraw the Y-axis.  The API_ADD_DATA command
+doesn't affect either axis but the API_NEW_DATA will result in the axes
+being rescaled (if they're autoranged) and redrawn.  The demo data never
+varies beyond -1 <= Y <= +1 and so we know the Y-axis does not need to
+be redrawn when replacing data.  Locking the Y-axis save a bit of redraw
+time and reduces unnecessary (and time-wasting) screen flicker.
+

@@ -1,0 +1,18 @@
+Last minute news
+****************
+The user manual states on page 1 that we ship two
+versions of EasyPlot: one 32-bit version (epw32.exe)
+for Windows 95 and NT users, and one 16-bit version
+(epw.exe) for Windows 3.1x users.
+
+The latter version epw.exe is not included in this
+release of EasyPlot version 4. Users of Windows 3.1x
+will need to install the Win32s disks supplied before
+they can use EasyPlot. Win32s is a utility supplied by
+Microsoft which emulates the 32-bit environment, so
+that you can use any program designed for Windows 95.
+The latest version which EasyPlot supports is version
+1.30c.
+
+End of readme file
+******************
