@@ -1,0 +1,20 @@
+******** graph attributes   ********
+/fpo  pd  11.50 8.50       ;page size
+/sf   "Arial"              ;font
+/sf   b   OFF              ;Bold
+/sf   i   OFF              ;Italic
+/sf   u   OFF              ;Underline
+/fpo  pt  18.00            ;base point size
+/fpo  gt  base             ;graph-title size
+/fpo  at  base             ;axis-title size
+/fpo  an  base             ;annotation size
+/fpo  lt  base             ;legend-text size
+/fpo  po  OFF              ;portrait mode
+/fpo  co  ON               ;color
+/fpo  lw  1.00             ;line weight
+/sa   d   0.10             ;data mark size
+/sa   t   0.50             ;tic size
+/sa   b   0.00             ;bar separation
+/sm    ON                  ;data marks
+/sc    OFF                  ;connect points
+/sd    OFF                 ;dashed lines

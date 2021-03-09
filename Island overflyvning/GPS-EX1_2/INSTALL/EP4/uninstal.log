@@ -1,0 +1,61 @@
+[Header]
+Signature=VISE
+Version=0001
+Product Name=EasyPlot
+
+[Directories]
+0=C:\Program Files
+1=C:\Program Files\EP4
+2=C:\Program Files\EP4\epidemo
+
+[Files]
+0=C:\Program Files\EP4\checkw32.dll
+1=C:\Program Files\EP4\checkwin.dll
+2=C:\Program Files\EP4\epw32.exe
+3=C:\Program Files\EP4\help.ep
+4=C:\Program Files\EP4\Readme.txt
+5=C:\Program Files\EP4\latenews.txt
+6=C:\Program Files\EP4\data2
+7=C:\Program Files\EP4\data3
+8=C:\Program Files\EP4\data4
+9=C:\Program Files\EP4\epidemo.exe
+10=C:\Program Files\EP4\epidemo\epi_doc.txt
+11=C:\Program Files\EP4\epidemo\epi.c
+12=C:\Program Files\EP4\epidemo\epi_lib.c
+
+[ProgramGroups]
+0=EasyPlot
+
+[ProgramItems]
+0=EasyPlot,EasyPlot
+1=EasyPlot,Read Me
+2=EasyPlot,Late News
+3=EasyPlot,epidemo
+4=EasyPlot,Programming Interface Demo Details
+5=EasyPlot,Remove EasyPlot
+
+[RegKeys]
+0=HKEY_LOCAL_MACHINE,Software\Cherwell Scientific
+1=HKEY_LOCAL_MACHINE,Software\Cherwell Scientific\EasyPlot
+2=HKEY_LOCAL_MACHINE,Software\Cherwell Scientific\EasyPlot\4.0
+
+[RegNames]
+0=HKEY_LOCAL_MACHINE,Software\Cherwell Scientific\EasyPlot\4.0,User Name
+1=HKEY_LOCAL_MACHINE,Software\Cherwell Scientific\EasyPlot\4.0,Organization
+2=HKEY_LOCAL_MACHINE,Software\Cherwell Scientific\EasyPlot\4.0,Serial Number
+
+[IniEntries]
+0=EasyPlot,User Name,C:\WINDOWS\WIN.INI
+1=EasyPlot,Organization,C:\WINDOWS\WIN.INI
+2=EasyPlot,Serial Number,C:\WINDOWS\WIN.INI
+
+[Strings]
+IDS_STRING1=Are you sure you want to completely remove the selected application and all of its components?
+IDS_STRING2=Confirm File Deletion
+IDS_STRING3=The system indicates that the following shared file is no longer used by any programs.
+IDS_STRING4=Remove Shared File?
+IDS_STRING5=Uninstall successfully completed.
+IDS_STRING6=Uninstall
+IDS_STRING7=If any programs are still using this file and it is removed, those programs may not function. Are you sure you want to remove the shared file?
+IDS_STRING8=Uninstall was partially successful.
+IDS_ADMINPRIVILEGESNEEDED=Administrative privileges are needed to uninstall this software.
